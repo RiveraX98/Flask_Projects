@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.css">
+
+    <title >Homepage</title>
+</head>
+<body>
+    <style> 
+    body {
+        background-image: url("https://media.istockphoto.com/id/488010990/vector/cupcake-seamless-pattern.jpg?s=1024x1024&w=is&k=20&c=aR8rBWymJVt4jPFEZ7cFJF9rT1mnZNiygEvOr8S3c5g=" );
+    }
+    </style>
+
+    <h1>Order Cupcakes</h1>
+    <button id="showAll">Show All</button><br>
+    
+
+ <div class="card row justify-content-md-center"  >   
+<div class="card-body" style="background-color:rgb(252, 197, 205);" >
+    <div class="row justify-content-md-center">
+        <div class="col-md-7 col-lg-5">
+            <h3>Add a Cupcake</h3>
+            <form>
+                <label>Flavor:
+                    <input type="text" id="flavor">
+                </label>
+                <label>Size:
+                    <input type="text" id="size">
+                </label>
+                <label>Rating:
+                    <input type="text" id="rating">
+                </label>
+                <label>Image:
+                    <input type="text" id="image">
+                </label><br>
+                <br><button id="add">Add</button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+   
+<div class="addCake">
+
+</div>
+   
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    <script src="https:/unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="../static/show_cakes.js"></script>
+ 
+</body>
+</html>
