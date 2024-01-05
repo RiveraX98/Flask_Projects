@@ -5,7 +5,7 @@ from forms import RegistrationForm, loginForm, FeedbackForm
 from sqlalchemy.exc import IntegrityError
 app = Flask(__name__)
 app.app_context().push()
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///Test_feedback"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///feedback"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ECHO"] = True
 app.config["SECRET_KEY"] = "abc123"
@@ -22,7 +22,7 @@ def show_homepage():
     if "user_id" in session:
         user = User.query.get(session["user_id"])
         return render_template("homepage.html", posts=feedback, user=user)
-    return render_template("homepage.html", posts=feedback)
+    return redirect("/login")
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -45,7 +45,7 @@ def handle_registration():
 
         session["user_id"] = user.id
         flash("Account created successfully", "success")
-        return redirect("/users/<username>")
+        return redirect(f"/users/{user.id}")
 
     return render_template("registration.html", form=form)
 
@@ -79,50 +79,53 @@ def show_user_details(user_id):
 @app.route("/logout")
 def logout_user():
     session.pop("user_id")
-    flash("logged out successfully", "success")
+    flash("Logged out successfully", "success")
     return redirect("/login")
 
 
-@app.route("/users/<username>/feedback/add", methods=["GET", "POST"])
-def add_feedback(username):
+@app.route("/users/<int:user_id>/feedback/add", methods=["GET", "POST"])
+def add_feedback(user_id):
     form = FeedbackForm()
+    user= User.query.filter_by(id=user_id).first()
+    url = f"/users/{user_id}/feedback/add"
+
     if form.validate_on_submit():
         title = form.title.data
         content = form.content.data
-        feedback = Feedback(title=title, content=content, username=username)
+        feedback = Feedback(title=title, content=content, username=user.username)
+        
         db.session.add(feedback)
         db.session.commit()
         flash("Thanks for providing Feedback", "success")
-        return redirect("/users/<username>")
+        return redirect(f"/users/{user.id}")
 
-    return render_template("feedback_form.html", form=form, username=username)
+    return render_template("feedback_form.html", form=form, user=user, url=url)
 
 
-@app.route("/feedback/<feedback_id>/update")
+@app.route("/feedback/<feedback_id>/update", methods=["POST"])
 def update_feedback(feedback_id):
     post = Feedback.query.get(feedback_id)
     form = FeedbackForm(obj=post)
+    url = f"/feedback/{feedback_id}/update"
     if form.validate_on_submit():
-        title = form.title.data
-        content = form.content.data
-        feedback = Feedback(title=title, content=content)
-        db.session.add(feedback)
+        post.title=form.title.data
+        post.content=form.content.data
         db.session.commit()
-        username = feedback.user.username
+        user_id= post.user.id
         flash("feedback updated", "success")
-        return redirect(f"/users/{username}")
+        return redirect(f"/users/{user_id}")
     else:
-        return render_template("feedback_form.html", form=form)
+        return render_template("feedback_form.html", form=form, user=post.user, url=url)
 
 
 @app.route("/feedback/<feedback_id>/delete", methods=["POST"])
 def delete_feedback(feedback_id):
     feedback = Feedback.query.get(feedback_id)
-    username = feedback.user.username
+    user_id = feedback.user.id
     db.session.delete(feedback)
     db.session.commit()
     flash("Feedback deleted successfully", "success")
-    return redirect(f"/users/{username}")
+    return redirect(f"/users/{user_id}")
 
 
 @app.route("/secret")
